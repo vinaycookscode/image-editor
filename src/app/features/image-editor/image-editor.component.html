@@ -1,0 +1,99 @@
+<div class="editor-root">
+  <!-- Dark/Light Mode Toggle Floating Button -->
+  <button class="mode-toggle-btn" mat-fab (click)="toggleDarkMode()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+    <mat-icon>{{ isDarkMode ? 'dark_mode' : 'light_mode' }}</mat-icon>
+  </button>
+  <!-- Top Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-icons">
+      <button mat-icon-button class="upload-btn" (click)="loadImage()" matTooltip="Upload Image">
+        <mat-icon>folder_open</mat-icon>
+      </button>
+      <div matTooltip="Undo" [matTooltipDisabled]="canUndo">
+        <button mat-icon-button (click)="undo()" [disabled]="!canUndo">
+          <mat-icon>undo</mat-icon>
+        </button>
+      </div>
+      <div matTooltip="Redo" [matTooltipDisabled]="canRedo">
+        <button mat-icon-button (click)="redo()" [disabled]="!canRedo">
+          <mat-icon>redo</mat-icon>
+        </button>
+      </div>
+      <button mat-icon-button (click)="flipImage('horizontal')" matTooltip="Flip Horizontal"><mat-icon>flip</mat-icon></button>
+      <button mat-icon-button (click)="rotateImage(-90)" matTooltip="Rotate Left"><mat-icon>rotate_left</mat-icon></button>
+      <button mat-icon-button (click)="rotateImage(90)" matTooltip="Rotate Right"><mat-icon>rotate_right</mat-icon></button>
+      <button mat-icon-button (click)="flipImage('vertical')" matTooltip="Flip Vertical"><mat-icon>flip_camera_android</mat-icon></button>
+      <button mat-icon-button (click)="toggleTool('aspect', $event)" matTooltip="Aspect Ratio"><mat-icon>aspect_ratio</mat-icon></button>
+      <button mat-icon-button (click)="toggleTool('grid', $event)" matTooltip="Grid"><mat-icon>grid_on</mat-icon></button>
+      <button mat-icon-button (click)="zoomImage(zoomLevel - 0.1)" [disabled]="zoomLevel <= 0.2" matTooltip="Zoom Out"><mat-icon>zoom_out</mat-icon></button>
+      <button mat-icon-button (click)="zoomImage(zoomLevel + 0.1)" [disabled]="zoomLevel >= 5" matTooltip="Zoom In"><mat-icon>zoom_in</mat-icon></button>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <button class="export-btn" (click)="exportImage('png')">Export</button>
+  </div>
+  <div class="editor-content">
+    <div class="editor-center">
+      <div class="canvas-container-outer">
+        <div class="canvas-container"
+             [class.dragging]="isDraggingCanvas"
+             (mousedown)="onCanvasMouseDown($event)"
+             (mousemove)="onCanvasMouseMove($event)"
+             (mouseup)="onCanvasMouseUp($event)"
+             (mouseleave)="onCanvasMouseUp($event)">
+          <canvas #canvasElement class="editor-canvas" [class.dragging]="isDraggingCanvas"></canvas>
+          <!-- Crop rectangle overlay -->
+          <div *ngIf="cropRect && currentImage$ | async" class="crop-rect-overlay"
+               [ngStyle]="{ left: (cropRect?.x || 0) + 'px', top: (cropRect?.y || 0) + 'px', width: (cropRect?.w || 0) + 'px', height: (cropRect?.h || 0) + 'px' }">
+            <div *ngFor="let handle of cropHandles; let i = index"
+                 class="crop-handle"
+                 [ngStyle]="getCropHandleStyle(i)"></div>
+          </div>
+          <!-- Draggable overlays for text/shapes -->
+          <ng-container *ngFor="let overlay of overlays; let i = index">
+            <div *ngIf="overlay.type === 'text' || overlay.type === 'shape'"
+                 class="draggable-overlay"
+                 [ngStyle]="{ left: overlay.x + 'px', top: overlay.y + 'px' }"
+                 (mousedown)="startDragOverlay($event, overlay, i)">
+              <span *ngIf="overlay.type === 'text'" [style.fontSize.px]="overlay.size" [style.color]="overlay.color">{{ overlay.text }}</span>
+              <ng-container *ngIf="overlay.type === 'shape'">
+                <svg *ngIf="overlay.shape === 'rect'" [attr.width]="overlay.w" [attr.height]="overlay.h">
+                  <rect width="100%" height="100%" stroke="#1976d2" fill="none" stroke-width="2" />
+                </svg>
+                <svg *ngIf="overlay.shape === 'circle'" [attr.width]="overlay.r*2" [attr.height]="overlay.r*2">
+                  <ellipse [attr.cx]="overlay.r" [attr.cy]="overlay.r" [attr.rx]="overlay.r" [attr.ry]="overlay.r" stroke="#1976d2" fill="none" stroke-width="2" />
+                </svg>
+                <svg *ngIf="overlay.shape === 'line'" width="100" height="2">
+                  <line x1="0" y1="1" x2="100" y2="1" stroke="#1976d2" stroke-width="2" />
+                </svg>
+              </ng-container>
+              <button mat-mini-fab color="primary" class="confirm-btn" (click)="confirmOverlay(overlay, $event)"><mat-icon>check</mat-icon></button>
+            </div>
+          </ng-container>
+        </div>
+        <!-- Tool Panels -->
+        <div *ngIf="selectedTool === 'text'" class="tool-panel" (click)="$event.stopPropagation()">
+          <div class="text-tool-panel">
+            <input #textInput type="text" placeholder="Enter text..." [(ngModel)]="textValue">
+            <input #colorInput type="color" [(ngModel)]="textColor">
+            <input #sizeInput type="number" placeholder="Size" min="8" max="72" [(ngModel)]="textSize">
+            <button class="add-text-btn" (click)="addTextOverlay()" [disabled]="!textValue.trim()">
+              <mat-icon>add</mat-icon>
+              Add Text
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="editor-sidebar">
+      <div class="sidebar-title">Image Editor</div>
+      <div class="sidebar-tools">
+        <button class="sidebar-tool" (click)="toggleTool('crop', $event)" [class.active]="selectedTool === 'crop'"><mat-icon>crop</mat-icon> Crop</button>
+        <button class="sidebar-tool" (click)="toggleTool('text', $event)" [class.active]="selectedTool === 'text'"><mat-icon>text_fields</mat-icon> Text</button>
+        <button class="sidebar-tool" (click)="toggleTool('draw', $event)" [class.active]="selectedTool === 'draw'"><mat-icon>edit</mat-icon> Draw</button>
+        <button class="sidebar-tool" (click)="addShapeOverlay('line')"><mat-icon>show_chart</mat-icon> Line</button>
+        <button class="sidebar-tool" (click)="addShapeOverlay('rect')"><mat-icon>rectangle</mat-icon> Rectangle</button>
+        <button class="sidebar-tool" (click)="addShapeOverlay('circle')"><mat-icon>circle</mat-icon> Ellipse</button>
+      </div>
+    </div>
+  </div>
+</div> 

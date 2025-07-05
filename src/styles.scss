@@ -1,1 +1,227 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Global CSS Variables for Theming */
+:root {
+  /* Light mode (default) */
+  --bg-main: #f8f9fa;
+  --bg-panel: #fff;
+  --text-main: #222;
+  --text-secondary: #555;
+  --border-main: #e0e0e0;
+  --shadow-main: 0 4px 24px rgba(0,0,0,0.06);
+  --toolbar-bg: #fff;
+  --toolbar-icon: #222;
+  --toolbar-icon-active: #2563eb;
+  --sidebar-bg: #fff;
+  --sidebar-title: #222;
+  --sidebar-hover: #f3f4f6;
+  --crop-border: #bdbdbd;
+  --handle-bg: #fff;
+  --handle-border: #bdbdbd;
+  --handle-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  --button-bg: #fff;
+  --button-text: #222;
+  --button-hover: #f3f4f6;
+  --input-bg: #fff;
+  --input-border: #e0e0e0;
+  --input-text: #222;
+}
+
+/* Dark mode */
+:root.dark-mode {
+  --bg-main: #181a1b;
+  --bg-panel: #23272b;
+  --text-main: #f1f3f4;
+  --text-secondary: #b0b3b8;
+  --border-main: #333a40;
+  --shadow-main: 0 4px 24px rgba(0,0,0,0.32);
+  --toolbar-bg: #23272b;
+  --toolbar-icon: #f1f3f4;
+  --toolbar-icon-active: #90caf9;
+  --sidebar-bg: #23272b;
+  --sidebar-title: #f1f3f4;
+  --sidebar-hover: #2c3136;
+  --crop-border: #90caf9;
+  --handle-bg: #23272b;
+  --handle-border: #90caf9;
+  --handle-shadow: 0 2px 8px rgba(144,202,249,0.18);
+  --button-bg: #23272b;
+  --button-text: #f1f3f4;
+  --button-hover: #2c3136;
+  --input-bg: #23272b;
+  --input-border: #333a40;
+  --input-text: #f1f3f4;
+}
+
+/* Global body styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Global HTML styles */
+html {
+  transition: background-color 0.3s ease;
+}
+
+/* Material Design theme overrides for dark mode */
+.dark-mode .mat-mdc-button,
+.dark-mode .mat-mdc-raised-button,
+.dark-mode .mat-mdc-fab,
+.dark-mode .mat-mdc-mini-fab {
+  color: var(--text-main) !important;
+}
+
+.dark-mode .mat-mdc-icon-button {
+  color: var(--toolbar-icon) !important;
+}
+
+.dark-mode .mat-mdc-icon-button:hover {
+  background-color: rgba(144, 202, 249, 0.1) !important;
+}
+
+/* Material Design icon color overrides for dark mode */
+.dark-mode .mat-mdc-icon-button mat-icon,
+.dark-mode .mat-mdc-fab mat-icon,
+.dark-mode .mat-mdc-mini-fab mat-icon {
+  color: var(--toolbar-icon) !important;
+}
+
+.dark-mode .mat-mdc-icon-button:hover mat-icon,
+.dark-mode .mat-mdc-fab:hover mat-icon,
+.dark-mode .mat-mdc-mini-fab:hover mat-icon {
+  color: var(--toolbar-icon-active) !important;
+}
+
+/* Ensure all Material Design icons are visible in dark mode */
+.dark-mode mat-icon {
+  color: var(--toolbar-icon) !important;
+}
+
+.dark-mode .mat-mdc-button mat-icon,
+.dark-mode .mat-mdc-raised-button mat-icon {
+  color: var(--text-main) !important;
+}
+
+/* Material Design tooltip styles for dark mode */
+.dark-mode .mat-mdc-tooltip {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-main) !important;
+  box-shadow: var(--shadow-main) !important;
+}
+
+.dark-mode .mat-mdc-tooltip-panel {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-main) !important;
+}
+
+/* Ensure tooltips are visible in both light and dark modes */
+.mat-mdc-tooltip {
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  max-width: 200px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Light mode tooltip styles */
+.mat-mdc-tooltip {
+  background-color: #323232 !important;
+  color: white !important;
+}
+
+/* Ensure tooltip panel is always visible */
+.mat-mdc-tooltip-panel {
+  z-index: 1000 !important;
+}
+
+/* Tooltip arrow styles */
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Ensure tooltips appear above other elements */
+.cdk-overlay-container {
+  z-index: 1000 !important;
+}
+
+.cdk-overlay-pane {
+  z-index: 1000 !important;
+}
+
+/* Force tooltip visibility */
+.mat-mdc-tooltip-panel {
+  pointer-events: none !important;
+}
+
+.mat-mdc-tooltip {
+  pointer-events: none !important;
+}
+
+/* Ensure tooltips are not hidden by overflow */
+.editor-toolbar {
+  overflow: visible !important;
+}
+
+.toolbar-icons {
+  overflow: visible !important;
+}
+
+.toolbar-icons button {
+  overflow: visible !important;
+}
+
+/* Native tooltip styles for dark mode */
+.dark-mode [title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-panel);
+  color: var(--text-main);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  border: 1px solid var(--border-main);
+  box-shadow: var(--shadow-main);
+  pointer-events: none;
+}
+
+/* Input styles for dark mode */
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+
+/* Scrollbar styles for dark mode */
+.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 4px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
