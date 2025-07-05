@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 import { imageEditorReducer } from './store/reducers/image-editor.reducer';
 import { ErrorHandlerService } from './core/services/error-handler.service';
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
       logOnly: false
     }),
     provideAnimations(),
+    provideRouter([]),
     { provide: ErrorHandler, useClass: ErrorHandlerService }
   ]
 };

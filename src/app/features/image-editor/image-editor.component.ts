@@ -1,17 +1,11 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy, Renderer2, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { NgStyle, NgForOf, NgIf } from '@angular/common';
+import { ClarityModule } from '@clr/angular';
 
 import { AppState } from '../../store/state/app.state';
 import * as ImageEditorActions from '../../store/actions/image-editor.actions';
@@ -28,14 +22,9 @@ import { LoggingService } from '../../core/services/logging.service';
     NgStyle,
     NgForOf,
     NgIf,
-    MatButtonModule,
-    MatIconModule,
-    MatSliderModule,
-    MatToolbarModule,
-    MatTooltipModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule
+    ClarityModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './image-editor.component.html',
   styleUrls: ['./image-editor.component.scss']
@@ -132,6 +121,9 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       ctx?.drawImage(img, 0, 0, w, h);
       this.saveHistory();
       this.resetTransforms();
+      // Reset canvas offset when new image is loaded
+      this.canvasOffset = { x: 0, y: 0 };
+      this.canvasElement.nativeElement.style.transform = '';
     };
     img.src = imageUrl;
   }
@@ -203,6 +195,20 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
     const ctx = canvas.getContext('2d');
     const img = new window.Image();
     img.onload = () => {
+      // Calculate if we need to swap dimensions for 90° or 270° rotation
+      const isRotated90or270 = Math.abs(this.rotation % 180) === 90;
+      const originalWidth = img.width;
+      const originalHeight = img.height;
+      
+      // Set canvas dimensions based on rotation
+      if (isRotated90or270) {
+        canvas.width = originalHeight;
+        canvas.height = originalWidth;
+      } else {
+        canvas.width = originalWidth;
+        canvas.height = originalHeight;
+      }
+      
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
       ctx?.save();
       ctx?.translate(canvas.width / 2, canvas.height / 2);
@@ -210,12 +216,12 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       ctx?.rotate((this.rotation * Math.PI) / 180);
       const scale = this.zoomLevel;
       ctx?.scale(scale, scale);
-      ctx?.drawImage(img, -img.width / 2, -img.height / 2);
+      ctx?.drawImage(img, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
       ctx?.restore();
       
-      // Apply canvas positioning for dragging
+      // Apply only translation for dragging, not scaling
       if (this.zoomLevel > 1) {
-        canvas.style.transform = `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px) scale(${this.zoomLevel})`;
+        canvas.style.transform = `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px)`;
       } else {
         canvas.style.transform = '';
       }
@@ -228,6 +234,9 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
     this.flipH = false;
     this.flipV = false;
     this.zoomLevel = 1;
+    this.canvasOffset = { x: 0, y: 0 };
+    const canvas = this.canvasElement.nativeElement;
+    canvas.style.transform = '';
   }
 
   // Tool panel logic
@@ -331,10 +340,14 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       this.lastDrawPoint = { x, y };
     } else if (this.selectedTool === 'text' || this.selectedTool === 'shape') {
       // handled by overlay drag
-    } else if (this.zoomLevel > 1) {
-      // Enable canvas dragging when zoomed
+    } else if (this.zoomLevel > 1.1) {
+      // Enable canvas dragging when zoomed in significantly
       this.isDraggingCanvas = true;
       this.canvasDragStart = { x: event.clientX, y: event.clientY };
+      const canvasContainer = canvas.closest('.canvas-container') as HTMLElement;
+      if (canvasContainer) {
+        canvasContainer.classList.add('dragging');
+      }
       event.preventDefault();
     }
   }
@@ -365,12 +378,13 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       // Handle canvas dragging when zoomed
       const deltaX = event.clientX - this.canvasDragStart.x;
       const deltaY = event.clientY - this.canvasDragStart.y;
+      
       this.canvasOffset.x += deltaX;
       this.canvasOffset.y += deltaY;
       this.canvasDragStart = { x: event.clientX, y: event.clientY };
       
-      // Apply transform to canvas
-      canvas.style.transform = `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px) scale(${this.zoomLevel})`;
+      // Apply only translation transform to canvas
+      canvas.style.transform = `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px)`;
     }
   }
 
@@ -389,6 +403,11 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       this.saveHistory();
     } else if (this.isDraggingCanvas) {
       this.isDraggingCanvas = false;
+      const canvas = this.canvasElement.nativeElement;
+      const canvasContainer = canvas.closest('.canvas-container') as HTMLElement;
+      if (canvasContainer) {
+        canvasContainer.classList.remove('dragging');
+      }
     }
   }
 
@@ -474,19 +493,25 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
   }
 
   private initializeTheme(): void {
-    // Check for saved theme preference or default to light mode
+    // Check for saved theme preference or default to dark mode
     const savedTheme = localStorage.getItem('image-editor-theme');
     const html = this.renderer.selectRootElement('html', true);
     
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-      this.renderer.removeClass(html, 'light-mode');
-      this.renderer.addClass(html, 'dark-mode');
-    } else {
+    if (savedTheme === 'light') {
       this.isDarkMode = false;
       this.renderer.removeClass(html, 'dark-mode');
       this.renderer.addClass(html, 'light-mode');
+    } else {
+      this.isDarkMode = true;
+      this.renderer.removeClass(html, 'light-mode');
+      this.renderer.addClass(html, 'dark-mode');
     }
+  }
+
+  resetCanvasPosition(): void {
+    this.canvasOffset = { x: 0, y: 0 };
+    const canvas = this.canvasElement.nativeElement;
+    canvas.style.transform = '';
   }
 
   toggleDarkMode() {

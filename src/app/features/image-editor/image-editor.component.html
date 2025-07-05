@@ -1,35 +1,36 @@
 <div class="editor-root">
   <!-- Dark/Light Mode Toggle Floating Button -->
-  <button class="mode-toggle-btn" mat-fab (click)="toggleDarkMode()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
-    <mat-icon>{{ isDarkMode ? 'dark_mode' : 'light_mode' }}</mat-icon>
+  <button class="mode-toggle-btn" cds-button="action" (click)="toggleDarkMode()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+    <cds-icon shape="{{ isDarkMode ? 'moon' : 'sun' }}"></cds-icon>
   </button>
   <!-- Top Toolbar -->
   <div class="editor-toolbar">
     <div class="toolbar-icons">
-      <button mat-icon-button class="upload-btn" (click)="loadImage()" matTooltip="Upload Image">
-        <mat-icon>folder_open</mat-icon>
+      <button cds-button="outline" class="upload-btn" (click)="loadImage()" title="Upload Image">
+        <cds-icon shape="folder"></cds-icon>
       </button>
-      <div matTooltip="Undo" [matTooltipDisabled]="canUndo">
-        <button mat-icon-button (click)="undo()" [disabled]="!canUndo">
-          <mat-icon>undo</mat-icon>
+      <div title="Undo">
+        <button cds-button="outline" (click)="undo()" [disabled]="!canUndo || !(currentImage$ | async)">
+          <cds-icon shape="undo"></cds-icon>
         </button>
       </div>
-      <div matTooltip="Redo" [matTooltipDisabled]="canRedo">
-        <button mat-icon-button (click)="redo()" [disabled]="!canRedo">
-          <mat-icon>redo</mat-icon>
+      <div title="Redo">
+        <button cds-button="outline" (click)="redo()" [disabled]="!canRedo || !(currentImage$ | async)">
+          <cds-icon shape="redo"></cds-icon>
         </button>
       </div>
-      <button mat-icon-button (click)="flipImage('horizontal')" matTooltip="Flip Horizontal"><mat-icon>flip</mat-icon></button>
-      <button mat-icon-button (click)="rotateImage(-90)" matTooltip="Rotate Left"><mat-icon>rotate_left</mat-icon></button>
-      <button mat-icon-button (click)="rotateImage(90)" matTooltip="Rotate Right"><mat-icon>rotate_right</mat-icon></button>
-      <button mat-icon-button (click)="flipImage('vertical')" matTooltip="Flip Vertical"><mat-icon>flip_camera_android</mat-icon></button>
-      <button mat-icon-button (click)="toggleTool('aspect', $event)" matTooltip="Aspect Ratio"><mat-icon>aspect_ratio</mat-icon></button>
-      <button mat-icon-button (click)="toggleTool('grid', $event)" matTooltip="Grid"><mat-icon>grid_on</mat-icon></button>
-      <button mat-icon-button (click)="zoomImage(zoomLevel - 0.1)" [disabled]="zoomLevel <= 0.2" matTooltip="Zoom Out"><mat-icon>zoom_out</mat-icon></button>
-      <button mat-icon-button (click)="zoomImage(zoomLevel + 0.1)" [disabled]="zoomLevel >= 5" matTooltip="Zoom In"><mat-icon>zoom_in</mat-icon></button>
+      <button cds-button="outline" (click)="flipImage('horizontal')" [disabled]="!(currentImage$ | async)" title="Flip Horizontal"><cds-icon shape="refresh"></cds-icon></button>
+      <button cds-button="outline" (click)="rotateImage(-90)" [disabled]="!(currentImage$ | async)" title="Rotate Left"><cds-icon shape="undo"></cds-icon></button>
+      <button cds-button="outline" (click)="rotateImage(90)" [disabled]="!(currentImage$ | async)" title="Rotate Right"><cds-icon shape="redo"></cds-icon></button>
+      <button cds-button="outline" (click)="flipImage('vertical')" [disabled]="!(currentImage$ | async)" title="Flip Vertical"><cds-icon shape="repeat"></cds-icon></button>
+      <button cds-button="outline" (click)="toggleTool('aspect', $event)" [disabled]="!(currentImage$ | async)" title="Aspect Ratio"><cds-icon shape="resize"></cds-icon></button>
+      <button cds-button="outline" (click)="toggleTool('grid', $event)" [disabled]="!(currentImage$ | async)" title="Grid"><cds-icon shape="grid-view"></cds-icon></button>
+      <button cds-button="outline" (click)="zoomImage(zoomLevel - 0.1)" [disabled]="zoomLevel <= 0.2 || !(currentImage$ | async)" title="Zoom Out"><cds-icon shape="minus"></cds-icon></button>
+      <span class="zoom-display" *ngIf="currentImage$ | async">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+      <button cds-button="outline" (click)="zoomImage(zoomLevel + 0.1)" [disabled]="zoomLevel >= 5 || !(currentImage$ | async)" title="Zoom In"><cds-icon shape="plus"></cds-icon></button>
     </div>
     <div class="toolbar-spacer"></div>
-    <button class="export-btn" (click)="exportImage('png')">Export</button>
+    <button cds-button="outline" class="export-btn" (click)="exportImage('png')" [disabled]="!(currentImage$ | async)">Export</button>
   </div>
   <div class="editor-content">
     <div class="editor-center">
@@ -39,7 +40,8 @@
              (mousedown)="onCanvasMouseDown($event)"
              (mousemove)="onCanvasMouseMove($event)"
              (mouseup)="onCanvasMouseUp($event)"
-             (mouseleave)="onCanvasMouseUp($event)">
+             (mouseleave)="onCanvasMouseUp($event)"
+             (dblclick)="resetCanvasPosition()">
           <canvas #canvasElement class="editor-canvas" [class.dragging]="isDraggingCanvas"></canvas>
           <!-- Crop rectangle overlay -->
           <div *ngIf="cropRect && currentImage$ | async" class="crop-rect-overlay"
@@ -66,7 +68,7 @@
                   <line x1="0" y1="1" x2="100" y2="1" stroke="#1976d2" stroke-width="2" />
                 </svg>
               </ng-container>
-              <button mat-mini-fab color="primary" class="confirm-btn" (click)="confirmOverlay(overlay, $event)"><mat-icon>check</mat-icon></button>
+              <button cds-button="action" class="confirm-btn" (click)="confirmOverlay(overlay, $event)"><cds-icon shape="check"></cds-icon></button>
             </div>
           </ng-container>
         </div>
@@ -76,8 +78,8 @@
             <input #textInput type="text" placeholder="Enter text..." [(ngModel)]="textValue">
             <input #colorInput type="color" [(ngModel)]="textColor">
             <input #sizeInput type="number" placeholder="Size" min="8" max="72" [(ngModel)]="textSize">
-            <button class="add-text-btn" (click)="addTextOverlay()" [disabled]="!textValue.trim()">
-              <mat-icon>add</mat-icon>
+            <button cds-button="outline" class="add-text-btn" (click)="addTextOverlay()" [disabled]="!textValue.trim() || !(currentImage$ | async)">
+              <cds-icon shape="plus"></cds-icon>
               Add Text
             </button>
           </div>
@@ -85,14 +87,13 @@
       </div>
     </div>
     <div class="editor-sidebar">
-      <div class="sidebar-title">Image Editor</div>
       <div class="sidebar-tools">
-        <button class="sidebar-tool" (click)="toggleTool('crop', $event)" [class.active]="selectedTool === 'crop'"><mat-icon>crop</mat-icon> Crop</button>
-        <button class="sidebar-tool" (click)="toggleTool('text', $event)" [class.active]="selectedTool === 'text'"><mat-icon>text_fields</mat-icon> Text</button>
-        <button class="sidebar-tool" (click)="toggleTool('draw', $event)" [class.active]="selectedTool === 'draw'"><mat-icon>edit</mat-icon> Draw</button>
-        <button class="sidebar-tool" (click)="addShapeOverlay('line')"><mat-icon>show_chart</mat-icon> Line</button>
-        <button class="sidebar-tool" (click)="addShapeOverlay('rect')"><mat-icon>rectangle</mat-icon> Rectangle</button>
-        <button class="sidebar-tool" (click)="addShapeOverlay('circle')"><mat-icon>circle</mat-icon> Ellipse</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="toggleTool('crop', $event)" [class.active]="selectedTool === 'crop'" [disabled]="!(currentImage$ | async)" data-tooltip="Crop Image"><cds-icon shape="expand-card"></cds-icon> Crop</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="toggleTool('text', $event)" [class.active]="selectedTool === 'text'" [disabled]="!(currentImage$ | async)" data-tooltip="Add Text"><cds-icon shape="add-text"></cds-icon> Text</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="toggleTool('draw', $event)" [class.active]="selectedTool === 'draw'" [disabled]="!(currentImage$ | async)" data-tooltip="Draw on Image"><cds-icon shape="pencil"></cds-icon> Draw</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="addShapeOverlay('line')" [disabled]="!(currentImage$ | async)" data-tooltip="Add Line"><cds-icon shape="minus"></cds-icon> Line</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="addShapeOverlay('rect')" [disabled]="!(currentImage$ | async)" data-tooltip="Add Rectangle"><cds-icon shape="expand-card"></cds-icon> Rectangle</button>
+        <button cds-button="flat" class="sidebar-tool" (click)="addShapeOverlay('circle')" [disabled]="!(currentImage$ | async)" data-tooltip="Add Ellipse"><cds-icon shape="circle"></cds-icon> Ellipse</button>
       </div>
     </div>
   </div>
