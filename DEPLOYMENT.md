@@ -18,7 +18,7 @@ npm run deploy
 3. Click "New site from Git"
 4. Select your `image-editor` repository
 5. Build command: `npm run build`
-6. Publish directory: `dist/image-editor`
+6. Publish directory: `dist/image-editor/browser`
 7. Deploy!
 
 ### 3. **Vercel (Free)**
@@ -49,7 +49,7 @@ If you prefer to deploy manually:
    npm run build
    ```
 
-2. **Upload the `dist/image-editor` folder** to any web hosting service:
+2. **Upload the `dist/image-editor/browser` folder** to any web hosting service:
    - AWS S3 + CloudFront
    - Google Cloud Storage
    - DigitalOcean App Platform
@@ -105,7 +105,7 @@ Current bundle size: ~509KB (slightly over budget but acceptable for an image ed
 If deployment fails:
 1. Check Node.js version (requires v20.19+)
 2. Run `npm install` to ensure all dependencies are installed
-3. Check build output in `dist/image-editor`
+3. Check build output in `dist/image-editor/browser`
 4. Verify all assets are included in the build
 
 ## 📞 Support
