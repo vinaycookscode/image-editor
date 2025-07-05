@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/image-editor",
+  "outputDirectory": "dist/image-editor/browser",
   "framework": "angular",
   "rewrites": [
     {
