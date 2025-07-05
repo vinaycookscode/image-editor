@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/image-editor-app",
+    "public": "dist/image-editor",
     "ignore": [
       "firebase.json",
       "**/.*",

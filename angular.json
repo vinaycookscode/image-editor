@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "image-editor-app": {
+    "image-editor": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -58,10 +58,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "image-editor-app:build:production"
+              "buildTarget": "image-editor:build:production"
             },
             "development": {
-              "buildTarget": "image-editor-app:build:development"
+              "buildTarget": "image-editor:build:development"
             }
           },
           "defaultConfiguration": "development"

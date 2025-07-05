@@ -1,5 +1,5 @@
 [build]
-  publish = "dist/image-editor-app"
+  publish = "dist/image-editor"
   command = "npm run build"
 
 [[redirects]]
