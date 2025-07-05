@@ -1,9 +1,10 @@
 [build]
   publish = "dist/image-editor/browser"
-  command = "npm run install:netlify && npm run build:netlify"
+  command = "npm config set legacy-peer-deps true && npm install --force && npm run build:netlify"
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--force"
 
 [[redirects]]
   from = "/*"
