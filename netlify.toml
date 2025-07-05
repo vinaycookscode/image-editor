@@ -1,6 +1,9 @@
 [build]
   publish = "dist/image-editor/browser"
-  command = "npm run build"
+  command = "npm run build:netlify"
+
+[build.environment]
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/*"
