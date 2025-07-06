@@ -31,6 +31,7 @@
   --input-text: #e9ecef; /* Clarity Dark Gray 9 */
   --primary-color: #49afd9; /* Clarity Blue 4 for dark mode */
   --hover-bg: #343a40; /* Clarity Dark Gray 2 */
+  --logo-filter: brightness(0) invert(1); /* Make logo white for dark mode */
 }
 
 /* Light mode - Clarity Light Theme Colors */
@@ -59,6 +60,7 @@
   --input-text: #21333b; /* Clarity Gray 9 */
   --primary-color: #0072a3; /* Clarity Blue 6 */
   --hover-bg: #f2f4f5; /* Clarity Gray 1 */
+  --logo-filter: brightness(0) invert(0); /* Keep logo dark for light mode */
 }
 
 /* Global body styles */
