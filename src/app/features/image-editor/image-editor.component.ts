@@ -63,7 +63,7 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
   canvasDragStart = { x: 0, y: 0 };
   canvasOffset = { x: 0, y: 0 };
   cropHandles = Array(8).fill(0);
-  isDarkMode = false;
+
   showMoreMenu = false;
 
   constructor(
@@ -80,7 +80,6 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeCanvas();
     this.setupSubscriptions();
-    this.initializeTheme();
   }
 
   ngOnDestroy(): void {
@@ -525,41 +524,10 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
     };
   }
 
-  private initializeTheme(): void {
-    // Check for saved theme preference or default to dark mode
-    const savedTheme = localStorage.getItem('image-editor-theme');
-    const html = this.renderer.selectRootElement('html', true);
-    
-    if (savedTheme === 'light') {
-      this.isDarkMode = false;
-      this.renderer.removeClass(html, 'dark-mode');
-      this.renderer.addClass(html, 'light-mode');
-    } else {
-      this.isDarkMode = true;
-      this.renderer.removeClass(html, 'light-mode');
-      this.renderer.addClass(html, 'dark-mode');
-    }
-  }
-
   resetCanvasPosition(): void {
     this.canvasOffset = { x: 0, y: 0 };
     const canvas = this.canvasElement.nativeElement;
     canvas.style.transform = '';
-  }
-
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    const html = this.renderer.selectRootElement('html', true);
-    
-    if (this.isDarkMode) {
-      this.renderer.removeClass(html, 'light-mode');
-      this.renderer.addClass(html, 'dark-mode');
-      localStorage.setItem('image-editor-theme', 'dark');
-    } else {
-      this.renderer.removeClass(html, 'dark-mode');
-      this.renderer.addClass(html, 'light-mode');
-      localStorage.setItem('image-editor-theme', 'light');
-    }
   }
 
   toggleMoreMenu(): void {

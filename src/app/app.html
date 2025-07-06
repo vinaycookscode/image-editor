@@ -1,8 +1,15 @@
 <div class="app-container">
   <header class="app-header">
-    <h1>{{ title }}</h1>
+    <div class="header-content">
+      <div class="header-logo">
+        <img src="logo.svg" alt="Image Editor Logo" class="app-logo">
+      </div>
+      <div class="header-spacer"></div>
+      <button class="mode-toggle-btn" cds-button="action" (click)="toggleDarkMode()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+        <cds-icon shape="{{ isDarkMode ? 'moon' : 'sun' }}"></cds-icon>
+      </button>
+    </div>
   </header>
-  
   <main class="app-main">
     <app-image-editor></app-image-editor>
   </main>
@@ -14,20 +21,86 @@
     display: flex;
     flex-direction: column;
   }
-
   .app-header {
     background-color: var(--bg-main);
     color: var(--text-main);
-    padding: 1rem 2rem;
+    padding: 0px 4px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
-
-  .app-header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 500;
+  .header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-
+  .header-logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    height: 64px;
+  }
+  .header-spacer {
+    flex: 1 1 auto;
+    min-width: 20px;
+  }
+  .app-logo {
+    width: 48px;
+    height: 48px;
+  }
+  .mode-toggle-btn {
+    background: var(--toolbar-bg) !important;
+    color: var(--toolbar-icon) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s;
+    border: none;
+    cursor: pointer;
+  }
+  .mode-toggle-btn:hover {
+    background: var(--button-hover) !important;
+    color: var(--toolbar-icon-active) !important;
+  }
+  .dark-mode .mode-toggle-btn {
+    background: #2a3439 !important;
+    color: #e9ecef !important;
+  }
+  .dark-mode .mode-toggle-btn:hover {
+    background: #343a40 !important;
+    color: #49afd9 !important;
+  }
+  @media (max-width: 768px) {
+    .app-header {
+      padding: 0px 4px;
+      min-height: 56px;
+    }
+    .header-content {
+      max-width: none;
+    }
+    .header-logo {
+      height: 56px;
+    }
+    .app-logo {
+      width: 40px;
+      height: 40px;
+    }
+    .mode-toggle-btn {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
   .app-main {
     flex: 1;
     overflow: hidden;

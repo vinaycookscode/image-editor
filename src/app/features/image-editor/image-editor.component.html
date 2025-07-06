@@ -1,17 +1,4 @@
 <div class="editor-root">
-  <!-- Header Section -->
-  <header class="app-header">
-    <div class="header-content">
-      <div class="header-logo">
-        <img src="assets/logo.svg" alt="Image Editor Logo" class="app-logo">
-      </div>
-      <div class="header-spacer"></div>
-      <button class="mode-toggle-btn" cds-button="action" (click)="toggleDarkMode()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
-        <cds-icon shape="{{ isDarkMode ? 'moon' : 'sun' }}"></cds-icon>
-      </button>
-    </div>
-  </header>
-  
   <!-- Top Toolbar -->
   <div class="editor-toolbar">
     <div class="toolbar-icons">

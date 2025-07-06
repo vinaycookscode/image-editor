@@ -1,1 +1,25 @@
- 
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="48" height="48" rx="12" fill="url(#gradient)"/>
+  
+  <!-- Image/Photo icon -->
+  <rect x="12" y="16" width="24" height="16" rx="2" fill="white" opacity="0.9"/>
+  
+  <!-- Mountain/landscape -->
+  <path d="M14 28 L18 24 L22 26 L26 22 L30 24 L34 20 L34 28 Z" fill="#4CAF50" opacity="0.8"/>
+  
+  <!-- Sun -->
+  <circle cx="32" cy="18" r="3" fill="#FFC107"/>
+  
+  <!-- Edit indicator -->
+  <circle cx="36" cy="12" r="4" fill="#FF5722"/>
+  <path d="M34 12 L36 10 L38 12 L36 14 Z" fill="white"/>
+  
+  <!-- Gradient -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg> 
