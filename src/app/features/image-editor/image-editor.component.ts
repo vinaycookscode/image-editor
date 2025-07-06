@@ -64,6 +64,7 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
   canvasOffset = { x: 0, y: 0 };
   cropHandles = Array(8).fill(0);
   isDarkMode = false;
+  showMoreMenu = false;
 
   constructor(
     private store: Store<AppState>,
@@ -301,12 +302,29 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
   }
 
   loadImage(): void {
+    // Create file input element
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+    input.multiple = false;
+    input.capture = 'environment'; // Enable camera on mobile
+    
+    // Handle file selection
     input.onchange = (event: any) => {
       const file = event.target.files[0];
       if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          this.store.dispatch(ImageEditorActions.loadImageFailure({ error: 'Please select an image file' }));
+          return;
+        }
+        
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          this.store.dispatch(ImageEditorActions.loadImageFailure({ error: 'File size too large. Please select an image under 10MB' }));
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.store.dispatch(ImageEditorActions.loadImageSuccess({ imageUrl: e.target.result }));
@@ -316,8 +334,23 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
         };
         reader.readAsDataURL(file);
       }
+      
+      // Clean up the input element
+      input.remove();
     };
-    input.click();
+    
+    // Handle cancellation
+    input.oncancel = () => {
+      input.remove();
+    };
+    
+    // Trigger file selection
+    try {
+      input.click();
+    } catch (error) {
+      this.store.dispatch(ImageEditorActions.loadImageFailure({ error: 'Failed to open file picker' }));
+      input.remove();
+    }
   }
 
   onCanvasMouseDown(event: MouseEvent): void {
@@ -527,5 +560,81 @@ export class ImageEditorComponent implements OnInit, OnDestroy {
       this.renderer.addClass(html, 'light-mode');
       localStorage.setItem('image-editor-theme', 'light');
     }
+  }
+
+  toggleMoreMenu(): void {
+    this.showMoreMenu = !this.showMoreMenu;
+  }
+
+  mobileToggleTool(tool: string, event: MouseEvent): void {
+    // Check if image is loaded before executing
+    this.currentImage$.subscribe(imageUrl => {
+      if (imageUrl) {
+        this.toggleTool(tool, event);
+        this.showMoreMenu = false;
+      }
+    }).unsubscribe();
+  }
+
+  mobileAddShapeOverlay(type: 'rect' | 'circle' | 'line'): void {
+    // Check if image is loaded before executing
+    this.currentImage$.subscribe(imageUrl => {
+      if (imageUrl) {
+        this.addShapeOverlay(type);
+        this.showMoreMenu = false;
+      }
+    }).unsubscribe();
+  }
+
+  mobileLoadImage(): void {
+    // Mobile-specific upload method with better error handling
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = false;
+    
+    // For mobile, don't use capture attribute as it might cause issues
+    // input.capture = 'environment';
+    
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file');
+          return;
+        }
+        
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File size too large. Please select an image under 10MB');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.store.dispatch(ImageEditorActions.loadImageSuccess({ imageUrl: e.target.result }));
+        };
+        reader.onerror = () => {
+          alert('Failed to read file');
+        };
+        reader.readAsDataURL(file);
+      }
+      input.remove();
+    };
+    
+    input.oncancel = () => {
+      input.remove();
+    };
+    
+    // Use a small delay to ensure the input is properly created
+    setTimeout(() => {
+      try {
+        input.click();
+      } catch (error) {
+        alert('Failed to open file picker');
+        input.remove();
+      }
+    }, 100);
   }
 } 

@@ -97,4 +97,74 @@
       </div>
     </div>
   </div>
+  
+  <!-- Mobile Bottom Button Group -->
+  <div class="mobile-bottom-group">
+    <div class="mobile-buttons">
+      <div class="mobile-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="mobileLoadImage()">
+          <cds-icon shape="folder"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">Upload</span>
+      </div>
+      <div class="mobile-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="undo()" [disabled]="!canUndo || !(currentImage$ | async)">
+          <cds-icon shape="undo"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">Undo</span>
+      </div>
+      <div class="mobile-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="redo()" [disabled]="!canRedo || !(currentImage$ | async)">
+          <cds-icon shape="redo"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">Redo</span>
+      </div>
+      <div class="mobile-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="rotateImage(-90)" [disabled]="!(currentImage$ | async)">
+          <cds-icon shape="undo"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">Rotate L</span>
+      </div>
+      <div class="mobile-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="rotateImage(90)" [disabled]="!(currentImage$ | async)">
+          <cds-icon shape="redo"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">Rotate R</span>
+      </div>
+      <div class="mobile-btn-container more-btn-container">
+        <button cds-button="outline" class="mobile-btn" (click)="toggleMoreMenu()" [disabled]="!(currentImage$ | async)">
+          <cds-icon shape="ellipsis-horizontal"></cds-icon>
+        </button>
+        <span class="mobile-btn-label">More</span>
+      </div>
+    </div>
+    
+    <!-- More Menu Dropdown -->
+    <div class="more-menu" *ngIf="showMoreMenu">
+      <div class="more-menu-item" (click)="mobileToggleTool('crop', $event)" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="expand-card"></cds-icon>
+        <span>Crop</span>
+      </div>
+      <div class="more-menu-item" (click)="mobileToggleTool('text', $event)" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="add-text"></cds-icon>
+        <span>Text</span>
+      </div>
+      <div class="more-menu-item" (click)="mobileToggleTool('draw', $event)" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="pencil"></cds-icon>
+        <span>Draw</span>
+      </div>
+      <div class="more-menu-item" (click)="mobileAddShapeOverlay('line')" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="minus"></cds-icon>
+        <span>Line</span>
+      </div>
+      <div class="more-menu-item" (click)="mobileAddShapeOverlay('rect')" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="expand-card"></cds-icon>
+        <span>Rectangle</span>
+      </div>
+      <div class="more-menu-item" (click)="mobileAddShapeOverlay('circle')" [class.disabled]="!(currentImage$ | async)">
+        <cds-icon shape="circle"></cds-icon>
+        <span>Ellipse</span>
+      </div>
+    </div>
+  </div>
 </div> 
