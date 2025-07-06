@@ -1,7 +1,12 @@
 .editor-root{min-height:100vh;background:var(--bg-main);display:flex;flex-direction:column}
-.editor-toolbar{display:flex;align-items:center;background:var(--bg-main);border-radius:8px 8px 0 0;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:0 32px;min-height:64px;margin:24px 24px 0 24px;overflow:visible}
-.toolbar-logo{display:flex;align-items:center;margin-right:24px;flex-shrink:0}
+
+/* Header Styles */
+.app-header{background:var(--bg-main);border-bottom:1px solid var(--border-main);box-shadow:0 1px 3px rgba(0,0,0,.08);padding:0 32px;min-height:64px;display:flex;align-items:center;justify-content:space-between}
+.header-content{display:flex;align-items:center;width:100%;max-width:1200px;margin:0 auto}
+.header-logo{display:flex;align-items:center;flex-shrink:0}
+.header-spacer{flex:1 1 auto;min-width:20px}
 .app-logo{width:40px;height:40px;filter:var(--logo-filter)}
+.editor-toolbar{display:flex;align-items:center;background:var(--bg-main);border-radius:8px 8px 0 0;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:0 32px;min-height:64px;margin:24px 24px 0 24px;overflow:visible}
 .toolbar-icons{display:flex;gap:12px}
 .toolbar-icons div{display:flex;cursor:pointer}
 .toolbar-icons button[cds-button="outline"]{color:var(--toolbar-icon);transition:color .2s,background .2s}
@@ -226,15 +231,15 @@
     display: block;
   }
   
+  .app-header {
+    display: none !important;
+  }
+  
   .editor-toolbar {
     display: none !important;
   }
   
   .editor-sidebar {
-    display: none !important;
-  }
-  
-  .toolbar-logo {
     display: none !important;
   }
   
